@@ -31,6 +31,7 @@ nonisolated public extension Logger {
     static let app = Logger(subsystem: subsystem, category: "app")
     static let archiveStore = Logger(subsystem: subsystem, category: "archive-store")
     static let backgroundTask = Logger(subsystem: subsystem, category: "background-task")
+    static let claudeExtractor = Logger(subsystem: subsystem, category: "claude-extractor")
     static let contentExtractor = Logger(subsystem: subsystem, category: "content-extractor")
     static let documentProcessing = Logger(subsystem: subsystem, category: "document-processing")
     static let documentProcessor = Logger(subsystem: subsystem, category: "document-processor")

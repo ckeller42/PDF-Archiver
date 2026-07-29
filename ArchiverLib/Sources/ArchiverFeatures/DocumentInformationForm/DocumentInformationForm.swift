@@ -7,6 +7,7 @@
 
 import ArchiverModels
 import ArchiverStore
+import ClaudeExtractorStore
 import ComposableArchitecture
 import ContentExtractorStore
 import Shared
@@ -42,6 +43,15 @@ struct DocumentInformationForm {
 
         @SharedReader(.appleIntelligenceCustomPrompt)
         var customPrompt: String?
+
+        @SharedReader(.claudeEnabled)
+        var claudeEnabled: Bool
+
+        @SharedReader(.claudeCustomPrompt)
+        var claudeCustomPrompt: String?
+
+        @SharedReader(.claudeModel)
+        var claudeModelRawValue: String?
 
         @SharedReader(.multiTagSelectionDelayEnabled)
         var multiTagSelectionDelayEnabled: Bool
@@ -99,6 +109,7 @@ struct DocumentInformationForm {
 
     @Dependency(\.archiveStore) var archiveStore
     @Dependency(\.textAnalyser) var textAnalyser
+    @Dependency(\.claudeExtractorStore) var claudeExtractorStore
     @Dependency(\.contentExtractorStore) var contentExtractorStore
     @Dependency(\.calendar) var calendar
     @Dependency(\.notificationCenter) var notificationCenter
@@ -211,8 +222,11 @@ struct DocumentInformationForm {
                 return .none
 
             case .startUpdatingAllSuggestionsWithAI(let documentUrl):
-                return .run { [appleIntelligenceEnabled = state.appleIntelligenceEnabled, customPrompt = state.customPrompt, documentId = state.document.id] send in
-                    let result = await startUpdatingAllSuggestionsWithAI(url: documentUrl, appleIntelligenceEnabled: appleIntelligenceEnabled, customPrompt: customPrompt, documentId: documentId)
+                return .run { [appleIntelligenceEnabled = state.appleIntelligenceEnabled, customPrompt = state.customPrompt, documentId = state.document.id, claudeEnabled = state.claudeEnabled, claudeCustomPrompt = state.claudeCustomPrompt, claudeModelRawValue = state.claudeModelRawValue] send in
+                    let claudeConfiguration = ClaudeConfiguration(isEnabled: claudeEnabled,
+                                                                  customPrompt: claudeCustomPrompt,
+                                                                  model: claudeModelRawValue.flatMap(ClaudeModel.init(rawValue:)) ?? .default)
+                    let result = await startUpdatingAllSuggestionsWithAI(url: documentUrl, appleIntelligenceEnabled: appleIntelligenceEnabled, customPrompt: customPrompt, documentId: documentId, claudeConfiguration: claudeConfiguration)
                     await send(.updateDocumentData(result))
                 }
                 // we try to abort the foundation model response after content generation
@@ -279,7 +293,13 @@ struct DocumentInformationForm {
         let tagSuggestions: [String]?
     }
 
-    private func startUpdatingAllSuggestionsWithAI(url: URL, appleIntelligenceEnabled: Bool, customPrompt: String?, documentId: Document.ID) async -> DocumentParsingResult {
+    struct ClaudeConfiguration {
+        let isEnabled: Bool
+        let customPrompt: String?
+        let model: ClaudeModel
+    }
+
+    private func startUpdatingAllSuggestionsWithAI(url: URL, appleIntelligenceEnabled: Bool, customPrompt: String?, documentId: Document.ID, claudeConfiguration: ClaudeConfiguration) async -> DocumentParsingResult {
 
         // analyse document content and fill suggestions
         let parserOutput = await archiveStore.parseFilename(url.lastPathComponent)
@@ -318,6 +338,15 @@ struct DocumentInformationForm {
                                                                                       text: text,
                                                                                       customPrompt: customPrompt,
                                                                                       documentId: documentId)) {
+                foundSpecification = content.specification
+                tagSuggestions = Array(content.tags).sorted()
+            } else if claudeConfiguration.isEnabled,
+                      await claudeExtractorStore.isConfigured(),
+                      let content = await claudeExtractorStore.getDocumentInformation(.init(currentDocuments: (try? await archiveStore.getDocuments()) ?? [],
+                                                                                            text: text,
+                                                                                            customPrompt: claudeConfiguration.customPrompt,
+                                                                                            model: claudeConfiguration.model)) {
+                // Claude is the cloud-based fallback when Apple Intelligence is disabled or unavailable
                 foundSpecification = content.specification
                 tagSuggestions = Array(content.tags).sorted()
             } else {

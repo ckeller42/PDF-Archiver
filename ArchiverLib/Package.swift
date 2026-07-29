@@ -37,6 +37,7 @@ let package = Package(
                     "ArchiverModels",
                     "ArchiverIntents",
                     "ArchiverStore",
+                    "ClaudeExtractorStore",
                     "ContentExtractorStore",
                     "DocumentProcessingPipeline",
                     "Shared",
@@ -65,6 +66,13 @@ let package = Package(
                 ]),
         .target(name: "ArchiverModels",
                 dependencies: []),
+        .target(name: "ClaudeExtractorStore",
+                dependencies: [
+                    "ArchiverModels",
+                    "Shared",
+                    .product(name: "Dependencies", package: "swift-dependencies"),
+                    .product(name: "DependenciesMacros", package: "swift-dependencies")
+                ]),
         .target(name: "ContentExtractorStore",
                 dependencies: [
                     "ArchiverModels"
