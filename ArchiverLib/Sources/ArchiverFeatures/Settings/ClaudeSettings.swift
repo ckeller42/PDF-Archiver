@@ -190,7 +190,7 @@ struct ClaudeSettingsView: View {
                         set: { store.send(.onModelSelected($0)) }
                     )) {
                         ForEach(ClaudeModel.allCases) { model in
-                            Text(verbatim: model.displayName)
+                            modelLabel(model)
                                 .tag(model)
                         }
                     }
@@ -209,7 +209,7 @@ struct ClaudeSettingsView: View {
                               axis: .vertical)
                     .lineLimit(1...)
                 } footer: {
-                    Text("\(store.customPrompt?.count ?? 0) / \(ClaudeSettings.maxCustomPromptLength)", bundle: #bundle)
+                    Text(verbatim: "\(store.customPrompt?.count ?? 0) / \(ClaudeSettings.maxCustomPromptLength)")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }
@@ -219,6 +219,16 @@ struct ClaudeSettingsView: View {
         .foregroundStyle(.primary)
         .onAppear {
             store.send(.onAppear)
+        }
+    }
+
+    private func modelLabel(_ model: ClaudeModel) -> Text {
+        switch model {
+        case .opus:
+            Text("Claude Opus (best quality)", bundle: #bundle)
+
+        case .haiku:
+            Text("Claude Haiku (fast & cheap)", bundle: #bundle)
         }
     }
 

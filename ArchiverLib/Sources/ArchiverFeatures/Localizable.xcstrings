@@ -299,6 +299,26 @@
     "Claude": {
       "shouldTranslate": false
     },
+    "Claude Haiku (fast & cheap)": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Claude Haiku (schnell & günstig)"
+          }
+        }
+      }
+    },
+    "Claude Opus (best quality)": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Claude Opus (beste Qualität)"
+          }
+        }
+      }
+    },
     "Clear Cache": {
       "comment": "Button to clear all cache entries",
       "localizations": {

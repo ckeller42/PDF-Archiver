@@ -8,7 +8,5 @@ reviews:
   auto_review:
     enabled: true
     drafts: false
-  path_filters:
-    - "!**/*.xcstrings"
 chat:
   auto_reply: true

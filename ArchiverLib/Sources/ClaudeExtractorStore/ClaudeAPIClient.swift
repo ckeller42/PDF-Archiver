@@ -91,6 +91,10 @@ struct ClaudeAPIClient: Sendable {
         guard messagesResponse.stopReason != "refusal" else {
             throw ClaudeAPIError.refused
         }
+        // A truncated response cannot contain the complete JSON payload
+        guard messagesResponse.stopReason != "max_tokens" else {
+            throw ClaudeAPIError.invalidResponse
+        }
         guard let jsonText = messagesResponse.content.first(where: { $0.type == "text" })?.text,
               let jsonData = jsonText.data(using: .utf8) else {
             throw ClaudeAPIError.invalidResponse
@@ -110,8 +114,11 @@ struct ClaudeAPIClient: Sendable {
             return true
         } catch ClaudeAPIError.invalidApiKey {
             return false
+        } catch ClaudeAPIError.serverError(let statusCode) where (400..<500).contains(statusCode) {
+            // A 4xx on this minimal request proves the key or account cannot be used
+            return false
         } catch {
-            // Other errors (rate limit, network, ...) do not tell us the key is wrong
+            // Other errors (rate limit, overload, network, ...) do not tell us the key is wrong
             return true
         }
     }

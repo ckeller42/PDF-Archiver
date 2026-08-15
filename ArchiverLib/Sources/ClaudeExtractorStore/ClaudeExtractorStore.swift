@@ -65,7 +65,9 @@ public actor ClaudeExtractorStore: Log {
                                                                       apiKey: apiKey)
 
         return Info(specification: response.description.trimmingCharacters(in: .whitespacesAndNewlines),
-                    tags: response.tags.prefix(10).map { $0.slugified(withSeparator: "") })
+                    tags: response.tags.prefix(10)
+                        .map { $0.slugified(withSeparator: "") }
+                        .filter { !$0.isEmpty })
     }
 
     private static func createSystemPrompt(customPrompt: String?, documents: [Document]) -> String {

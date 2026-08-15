@@ -346,7 +346,8 @@ struct DocumentInformationForm {
                                                                                             text: text,
                                                                                             customPrompt: claudeConfiguration.customPrompt,
                                                                                             model: claudeConfiguration.model)) {
-                // Claude is the cloud-based fallback when Apple Intelligence is disabled or unavailable
+                // Claude handles the request when Apple Intelligence is disabled, unavailable,
+                // or returned no result - the document text is then sent to the Anthropic API
                 foundSpecification = content.specification
                 tagSuggestions = Array(content.tags).sorted()
             } else {

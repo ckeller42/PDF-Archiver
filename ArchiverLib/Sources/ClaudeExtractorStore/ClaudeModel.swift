@@ -15,14 +15,4 @@ public enum ClaudeModel: String, CaseIterable, Codable, Sendable, Identifiable {
     public var id: String { rawValue }
 
     public static let `default`: ClaudeModel = .opus
-
-    public var displayName: String {
-        switch self {
-        case .opus:
-            return "Claude Opus (best quality)"
-
-        case .haiku:
-            return "Claude Haiku (fast & cheap)"
-        }
-    }
 }
