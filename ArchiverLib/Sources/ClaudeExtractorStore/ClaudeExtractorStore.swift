@@ -6,7 +6,6 @@
 import ArchiverModels
 import Foundation
 import OSLog
-import Shared
 
 /// Extract document information (description and tags) using the Claude API
 ///

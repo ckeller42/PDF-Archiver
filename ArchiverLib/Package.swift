@@ -69,7 +69,6 @@ let package = Package(
         .target(name: "ClaudeExtractorStore",
                 dependencies: [
                     "ArchiverModels",
-                    "Shared",
                     .product(name: "Dependencies", package: "swift-dependencies"),
                     .product(name: "DependenciesMacros", package: "swift-dependencies")
                 ]),

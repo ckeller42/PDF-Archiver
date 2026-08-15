@@ -8,7 +8,6 @@ import Dependencies
 import DependenciesMacros
 import Foundation
 import OSLog
-import Shared
 
 @DependencyClient
 public struct ClaudeExtractorStoreDependency: Sendable {

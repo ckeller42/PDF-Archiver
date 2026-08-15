@@ -3,10 +3,10 @@
 //  ArchiverLib
 //
 
+import ArchiverModels
 import Foundation
 import OSLog
 import Security
-import Shared
 
 /// Stores the Anthropic API key in the Keychain
 ///
