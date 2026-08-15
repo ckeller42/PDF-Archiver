@@ -83,6 +83,7 @@ struct Settings {
         case aboutMe
         case appleIntelligenceSettings(AppleIntelligenceSettings)
         case archiveStorage(StorageSelection)
+        case claudeSettings(ClaudeSettings)
         case expertSettings(ExpertSettings)
         case imprint
         case legal
@@ -120,6 +121,7 @@ struct Settings {
         case onAboutMeTapped
         case onAdvancedSettingsTapped
         case onAppleIntelligenceSettingsTapped
+        case onClaudeSettingsTapped
         case onContactSupportTapped
         case onImprintTapped
         case onLegalTapped
@@ -160,6 +162,10 @@ struct Settings {
 
             case .onAppleIntelligenceSettingsTapped:
                 state.destination = .appleIntelligenceSettings(AppleIntelligenceSettings.State())
+                return .none
+
+            case .onClaudeSettingsTapped:
+                state.destination = .claudeSettings(ClaudeSettings.State())
                 return .none
 
             case .onContactSupportTapped:
@@ -294,6 +300,14 @@ struct SettingsView: View {
                         preconditionFailure("Failed to load export nothing found")
                     }
 
+                case .claudeSettings:
+                    if let claudeSettingsStore = store.scope(\.destination?.claudeSettings, action: \.destination.claudeSettings) {
+                        ClaudeSettingsView(store: claudeSettingsStore)
+                            .navigationTitle(Text("Claude", bundle: #bundle))
+                    } else {
+                        preconditionFailure("Failed to load Claude settings")
+                    }
+
                 case .expertSettings:
                     if let expertSettingsStore = store.scope(\.destination?.expertSettings, action: \.destination.expertSettings) {
                         ExpertSettingsView(store: expertSettingsStore)
@@ -356,6 +370,12 @@ struct SettingsView: View {
                 store.send(.onAppleIntelligenceSettingsTapped)
             } label: {
                 Label(String(localized: "Apple Intelligence", bundle: #bundle), systemImage: "apple.intelligence")
+            }
+
+            Button {
+                store.send(.onClaudeSettingsTapped)
+            } label: {
+                Label(String(localized: "Claude", bundle: #bundle), systemImage: "sparkles")
             }
 
             Button {
@@ -445,6 +465,12 @@ struct SettingsMacView: View {
                             if let storageSelectionStore = store.scope(\.destination?.archiveStorage, action: \.destination.archiveStorage) {
                                 StorageSelectionView(store: storageSelectionStore)
                                     .navigationTitle(Text("Storage", bundle: #bundle))
+                            }
+
+                        case .claudeSettings:
+                            if let claudeSettingsStore = store.scope(\.destination?.claudeSettings, action: \.destination.claudeSettings) {
+                                ClaudeSettingsView(store: claudeSettingsStore)
+                                    .navigationTitle(Text("Claude", bundle: #bundle))
                             }
 
                         case .expertSettings:
@@ -559,6 +585,14 @@ struct SettingsMacView: View {
                     }
                 } label: {
                     Label(String(localized: "Apple Intelligence", bundle: #bundle), systemImage: "apple.intelligence")
+                }
+
+                LabeledContent {
+                    Button(String(localized: "Configure…", bundle: #bundle)) {
+                        store.send(.onClaudeSettingsTapped)
+                    }
+                } label: {
+                    Label(String(localized: "Claude", bundle: #bundle), systemImage: "sparkles")
                 }
 
                 LabeledContent {
