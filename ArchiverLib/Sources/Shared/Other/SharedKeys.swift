@@ -18,6 +18,9 @@ enum Names: String {
     case appleIntelligenceEnabled = "apple-intelligence-enabled"
     case appleIntelligenceCustomPrompt = "apple-intelligence-custom-prompt"
     case appleIntelligenceCacheEnabled = "apple-intelligence-cache-enabled"
+    case claudeEnabled = "claude-enabled"
+    case claudeCustomPrompt = "claude-custom-prompt"
+    case claudeModel = "claude-model"
     case backgroundCacheNotificationsEnabled = "background-cache-notifications-enabled"
     case multiTagSelectionDelayEnabled = "multi-tag-selection-delay-enabled"
     case ocrEnabled = "ocr-enabled"
@@ -139,6 +142,41 @@ public extension SharedKey where Self == AppStorageKey<Bool> {
 public extension SharedKey where Self == AppStorageKey<Bool>.Default {
   static var appleIntelligenceCacheEnabled: Self {
       return Self[.appStorage(Names.appleIntelligenceCacheEnabled.id), default: true]
+  }
+}
+
+/// `true` if Claude should be used for document information extraction (cloud-based, opt-in)
+public extension SharedKey where Self == AppStorageKey<Bool> {
+    static var claudeEnabled: Self {
+        appStorage(Names.claudeEnabled.id, store: .standard)
+    }
+}
+public extension SharedKey where Self == AppStorageKey<Bool>.Default {
+  static var claudeEnabled: Self {
+      return Self[.appStorage(Names.claudeEnabled.id, store: .standard), default: false]
+  }
+}
+
+public extension SharedKey where Self == AppStorageKey<String?> {
+    static var claudeCustomPrompt: Self {
+        appStorage(Names.claudeCustomPrompt.id, store: .standard)
+    }
+}
+public extension SharedKey where Self == AppStorageKey<String?>.Default {
+  static var claudeCustomPrompt: Self {
+      return Self[.appStorage(Names.claudeCustomPrompt.id, store: .standard), default: nil]
+  }
+}
+
+/// Raw value of the selected Claude model - stored as a string because Shared must not depend on ClaudeExtractorStore
+public extension SharedKey where Self == AppStorageKey<String?> {
+    static var claudeModel: Self {
+        appStorage(Names.claudeModel.id, store: .standard)
+    }
+}
+public extension SharedKey where Self == AppStorageKey<String?>.Default {
+  static var claudeModel: Self {
+      return Self[.appStorage(Names.claudeModel.id, store: .standard), default: nil]
   }
 }
 
